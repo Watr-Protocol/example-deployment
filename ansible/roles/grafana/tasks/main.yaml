@@ -1,0 +1,33 @@
+# main.yaml
+---
+
+- name: Configure certbot for serving https
+  include_tasks: certbot.yaml
+  args:
+    apply:
+      tags:
+        - certbot
+  when: domain_name is defined
+  register: certbot
+  tags: certbot
+
+
+- name: Configure nginx for proxying https
+  include_tasks: nginx.yaml
+  args:
+    apply:
+      tags:
+        - nginx
+  when: domain_name is defined
+  register: nginx
+  tags: nginx
+
+
+- name: Install and configure grafana
+  include_tasks: grafana.yaml
+  args:
+    apply:
+      tags:
+        - grafana-server
+  register: grafana
+  tags: grafana-server

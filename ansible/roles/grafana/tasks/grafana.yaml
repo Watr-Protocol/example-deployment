@@ -1,0 +1,51 @@
+---
+- name: Add grafana gpg key
+  apt_key:
+    url: https://packages.grafana.com/gpg.key
+    state: present
+
+- name: Add grafana repo
+  apt_repository:
+    repo: deb https://packages.grafana.com/oss/deb stable main
+    state: present
+    filename: grafana
+
+- name: Install grafana
+  apt:
+    name: grafana
+    state: present
+    update_cache: yes
+
+- name: Put grafana's config on the host
+  template:
+    src: grafana.ini.j2
+    dest: /etc/grafana/grafana.ini
+    owner: root
+    group: grafana
+    mode: 0640
+    backup: yes
+  register: configuration
+
+- name: Provision default datasources
+  template:
+    src: datasources.yaml.j2
+    dest: /etc/grafana/provisioning/datasources/datasources.yaml
+    owner: root
+    group: grafana
+    mode: 0640
+  register: datasource
+
+- name: Provision grafana dashboards
+  copy:
+    src: dashboards/
+    dest: /etc/grafana/provisioning/dashboards
+    owner: root
+    group: grafana
+    mode: 0640
+
+- name: Enable and start grafana server
+  systemd:
+    name: grafana-server
+    enabled: true
+    state: restarted
+  when: configuration.changed or datasource.changed

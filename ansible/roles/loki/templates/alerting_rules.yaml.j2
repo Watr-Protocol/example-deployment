@@ -1,0 +1,31 @@
+groups:
+    - name: watr error logs
+      rules:
+        - alert: watr error logs
+          expr: count_over_time({level="ERROR",unit="watr.service"}[5m]) >= 1
+          for: 10m
+          labels:
+            category: logs
+            severity: warning
+          annotations:
+            message: watr error logs
+    - name: watr logs missing
+      rules:
+        - alert: watr logs missing
+          expr: count_over_time({unit="watr.service"}[5m]) == 0
+          for: 10m
+          labels:
+            category: logs
+            severity: warning
+          annotations:
+            message: watr logs missing
+    - name: logging volume very high
+      rules:
+        - alert: logging volume very high on host
+          expr: sum by (host) (count_over_time({unit="watr.service"}[1h])) > 200000
+          for: 2h
+          labels:
+            category: logs
+            severity: warning
+          annotations:
+            message: the host is sending a very high amount of logs

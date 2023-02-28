@@ -1,0 +1,58 @@
+# This is a more secure alternative to the distro-default one
+# It is not total config, and leaves a lot of options to their defaults
+# (which are mostly sane, at least in debian 10 at the moment of writing)
+#
+# More info on the configuration options can be found in man(5) of sshd_cofig
+# Up-to-date version is available online here: http://man7.org/linux/man-pages/man5/sshd_config.5.html
+
+# Should be the only one enabled by defaul in the modern implementations, but who knows?
+Protocol 2
+
+PermitRootLogin no # Local root logins should also be disabled; use `sudo`
+AllowGroups ssh # We only allow logins for users in ssh group
+
+StrictModes yes # Check homefolder file modes before connecting -- won't hurt, usually on by default
+
+MaxAuthTries 6
+MaxSessions 10
+MaxStartups 10:30:60 # Use probabilistic dropoff for when there are too many unathenticated connections
+LoginGraceTime 120 # Disconnect unauthenticated clients after waiting for auth for 2 minutes
+
+TCPKeepAlive yes # To avoid infinitely hanging sessions
+ClientAliveInterval 60 # Probe connection liveness every minute of inactivity
+
+
+# We only want key-based authentication
+PubkeyAuthentication yes
+
+ChallengeResponseAuthentication no
+GSSAPIAuthentication no
+HostbasedAuthentication no
+KerberosAuthentication no
+PasswordAuthentication no
+
+# These files are only editable by root, so it would be harder to attackers to add their keys
+AuthorizedKeysFile /etc/ssh/authorized_keys/%u.keys
+
+
+# Disabling systems and features we don't need
+UsePAM yes # PAM is required for SELinux to work, for user-based limits being enforced, and for certain other features to work; we're keeping it
+UseDNS no # This is a questionable protection from ip spoofing, which leaks client's IP to DNS and slows down logins
+
+# AllowAgentForwarding no # Helps to protect clients from compromised server
+AllowAgentForwarding yes
+PermitTunnel no # We don't use tun device forwarding
+PermitUserEnvironment no # Just to avoid any LD_PRELOAD trickery
+X11Forwarding no # We don't have X on our servers
+
+# Self-evident options to reduce visual noise, especially on Ubuntu which uses MotD for ads
+Banner none
+PrintMotd no
+
+# Crypto setup follows Mozilla's guidelines: https://infosec.mozilla.org/guidelines/openssh
+KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+
+# for ansible
+Subsystem sftp  /usr/lib/openssh/sftp-server

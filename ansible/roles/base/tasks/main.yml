@@ -1,0 +1,87 @@
+---
+- name: Set hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+    use: systemd
+
+- name: Ensure hostname resolves (if not already configured to localhost)
+  lineinfile:
+    path: /etc/hosts
+    regexp: " {{ inventory_hostname }}( |$)"
+    insertafter: ^127.0.0.1
+    line: 127.0.0.2 {{ inventory_hostname }}
+    state: present
+
+- name: Add inventory nodes to /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: "{{ item }}"
+    line: "{{ hostvars[item]['int_ip'] | default(hostvars[item]['enode'] | default('# ANSIBLE ERROR') | \
+      \ regex_search('\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b')) }} {{ item }}"
+  loop: "{{ groups['all'] }}"
+  when: item != inventory_hostname and ('int_ip' in hostvars[item] or 'enode' in hostvars[item])
+  tags: hosts
+
+- name: Check if there is a aws cloud.cfg
+  stat:
+    path: /etc/cloud/cloud.cfg
+  register: cloud_cfg
+
+- name: Preserve hostname on aws
+  lineinfile:
+    path: /etc/cloud/cloud.cfg
+    regexp: "^preserve_hostname: .*"
+    line: "preserve_hostname: true"
+    state: present
+  when: cloud_cfg.stat.exists
+
+- name: Applying systemd-journald config
+  copy:
+    src: journald.conf
+    dest: /etc/systemd/journald.conf
+    mode: 0644
+    owner: root
+    group: root
+  register: journald_r
+
+- name: Restart systemd-journald
+  systemd:
+    name: systemd-journald
+    state: restarted
+  when: journald_r.changed
+
+- name: Install base packages
+  apt:
+    pkg: "{{ query('flattened', ['{{ base_packages }}', '{{ additional_packages }}']) }}"
+    state: present
+    autoclean: yes
+
+- name: Configure system for chrony
+  tags:
+    - time
+  block:
+    - name: Make sure ntp is removed
+      apt:
+        name: ntp
+        state: absent
+
+    - name: Install chrony
+      apt:
+        name: chrony
+        state: present
+
+    - name: Render chrony configuration
+      template:
+        src: chrony.conf.j2
+        dest: /etc/chrony/chrony.conf
+        owner: root
+        group: root
+        mode: "0644"
+      register: chrony_conf
+
+    - name: Enable and start chrony
+      systemd:
+        name: chrony
+        state: restarted
+        enabled: true
+      when: chrony_conf.changed

@@ -1,0 +1,6 @@
+---
+- name: All nodes
+  hosts: all
+  become: yes
+  roles:
+    - parity.chain.node

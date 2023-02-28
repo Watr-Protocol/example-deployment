@@ -1,0 +1,25 @@
+# certbot.yaml
+#
+# for these tasks and certbot to work the instance should assume a role which
+# allows ListHostedZones, ListResourceRecordSets, ChangeResourceRecordSets on
+# the hosted zone e.g. Z0158602OPJY3TTHL5FA
+---
+- name: Update deb package list
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install certbot and python3-boto
+  apt:
+    name:
+      - python3-boto
+      - certbot
+      - python3-certbot-nginx
+    state: present
+  register: certbot_installed
+
+- name: Run certbot command
+  environment:
+    # Force unset http_proxy which cause a bug
+    http_proxy: ""
+  command: certbot certonly --nginx -n --agree-tos --email {{ smtp_to }} -d {{ domain_name }}

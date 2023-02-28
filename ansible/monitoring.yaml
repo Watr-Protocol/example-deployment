@@ -1,0 +1,21 @@
+---
+- name: set up the exporters on the nodes for monitoring
+  hosts: all
+  gather_facts: false
+  become: true
+  vars:
+    prometheus_source: bullseye
+  roles:
+    - role: prometheus-node-exporter
+
+- name: set up the monitoring server
+  hosts: monitoring
+  gather_facts: false
+  become: true
+  vars:
+    prometheus_source: bullseye
+  roles:
+    - role: grafana
+    - role: prometheus
+      tags: prometheus
+

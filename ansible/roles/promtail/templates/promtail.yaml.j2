@@ -1,0 +1,90 @@
+# promtail server config
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+  log_level: info
+
+positions:
+  filename: {{ promtail_data_dir }}/positions.yaml
+
+# loki servers
+clients:
+{% if 'monitoring' in groups %}
+{% for host in groups['monitoring'] %}
+  - url: http://{{ hostvars[host].int_ip | default(host + '.' + internal_domain) }}:3100/loki/api/v1/push
+{% endfor %}
+{% endif %}
+{% if monitoring is defined %}
+  - url: http://{{ monitoring  + '.' + internal_domain }}:3100/loki/api/v1/push
+{% endif %}
+
+scrape_configs:
+{% if promtail_journald | default(True) %}
+  - job_name: journald
+    journal:
+      max_age: 7h
+      path: /var/log/journal
+      labels:
+        job: journald
+        host: {{ inventory_hostname }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+{% endif %}
+{% if parity_log_path is defined and ( ('collators' in group_names) or ('accessnodes' in group_names) or ('archivenodes' in group_names) or ('indexnodes' in group_names) ) %}
+  - job_name: parity
+    entry_parser: raw
+    static_configs:
+      - labels:
+          __path__: {{ parity_log_path }}
+          job: parity
+          host: {{ inventory_hostname }}
+    pipeline_stages:
+      - match:
+          selector: '{job="parity"}'
+{% else %}
+    pipeline_stages:
+      - match:
+          selector: '{unit="watr.service"}'
+{% endif %}
+          stages:
+            - regex:
+                expression: '(?P<date>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} [^\s]+)\s+(?P<thread>.+)?\s+(?P<level>(TRACE|DEBUG|INFO|WARN|ERROR))\s+(?P<module>[^\s]+)\s+(?P<message>.+)'
+            - labels:
+                level:
+                module:
+            - match:
+                selector: '{module="rpc"}'
+                stages:
+                    - regex:
+                        expression: '(?P<request_type>Response|Request): (?P<json_data>.+)\.'
+                        source: message
+                    - json:
+                        expressions:
+                            request_id: id
+                            request_method: method
+                        source: json_data
+                    - labels:
+                        request_method:
+                        request_type: request_type
+                    - metrics:
+                        rpc_requests:
+                            type: Counter
+                            description: "JSON-RPC requests"
+                            prefix: "parity_"
+                            source: request_type
+                            config:
+                                value: Request
+                                action: inc
+            - drop:
+                source: 'level'
+                expression: '(TRACE|DEBUG)'
+            - timestamp:
+                location: UTC
+                format: "2006-01-02 15:04:05 MST"
+                fallback_format: "2006-01-02 15:04:05"
+                source: date
+            - output:
+                source: message
+
+# vim: set ft=yaml expandtab :

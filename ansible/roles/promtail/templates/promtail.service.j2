@@ -1,0 +1,26 @@
+[Unit]
+Description=Promtail
+Documentation=https://grafana.com/loki
+
+[Service]
+Restart=always
+User=promtail
+Group=promtail
+EnvironmentFile=/etc/default/promtail
+ExecStart={{ promtail_binary_path }} -config.file {{ promtail_config_path }}
+ExecReload=/bin/kill -HUP $MAINPID
+TimeoutStopSec=20s
+PrivateTmp=yes
+ProtectSystem=full
+{% if parity_log_path is defined and parity_log_path.startswith('/home/') %}
+# need to ready parity logs from the home directory
+ProtectHome=no
+{% else %}
+ProtectHome=yes
+{% endif %}
+# unavailable in ubuntu 18
+# ProtectDevices=yes
+
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,25 @@
+---
+- name: Update deb package list
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install the packages
+  apt:
+    name:
+      - prometheus-node-exporter
+    state: latest
+  register: installed
+
+- name: Put prometheus-node-exporters' default config on the host
+  template:
+    src: default.j2
+    dest: /etc/default/prometheus-node-exporter
+  register: defaults
+
+- name: Restart and enable prometheus node exporter
+  systemd:
+    enabled: true
+    state: restarted
+    name: prometheus-node-exporter
+  when: installed.changed or defaults.changed

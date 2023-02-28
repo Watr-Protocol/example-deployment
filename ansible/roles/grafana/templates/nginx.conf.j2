@@ -1,0 +1,90 @@
+upstream grafana {
+  keepalive 8;
+  server localhost:3000;
+}
+
+upstream prometheus {
+  keepalive 8;
+  server localhost:9090;
+}
+
+server {
+  listen 443 ssl http2;
+  listen [::]:443 ssl http2;
+  server_name {{ domain_name }};
+
+  root /usr/share/nginx;
+  index index.html index.htm;
+
+  ssl_certificate /etc/letsencrypt/live/{{ domain_name }}/cert.pem;
+  ssl_certificate_key /etc/letsencrypt/live/{{ domain_name }}/privkey.pem;
+  ssl_session_timeout 1d;
+  ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions
+  ssl_session_tickets off;
+
+
+  ssl_dhparam /etc/nginx/dhparam.pem;
+
+  # intermediate configuration
+  ssl_protocols TLSv1.2 TLSv1.3;
+  ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+  ssl_prefer_server_ciphers off;
+
+  # HSTS (ngx_http_headers_module is required) (63072000 seconds)
+  add_header Strict-Transport-Security "max-age=63072000" always;
+
+  access_log syslog:server=unix:/dev/log combined;
+  # access_log /dev/stdout; # doesn't work
+  # error_log  syslog:server=unix:/dev/log debug;
+  error_log  stderr;
+
+
+  if ($host != "{{ domain_name }}") {
+    return 444;
+  }
+
+
+  location / {
+    proxy_pass http://grafana;
+
+    proxy_set_header Host $http_host;
+    proxy_set_header CLIENT_IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_read_timeout 180;
+    proxy_cookie_path / "/; HTTPOnly; Secure";
+    gzip on;
+    gzip_types text/plain text/xml text/css image/svg+xml application/javascript application/x-javascript application/json application/xml;
+    gzip_proxied any;
+    client_max_body_size 20m;
+  }
+
+
+  location /metrics {
+    return 302 /login;
+  }
+
+
+  location /prometheus/ {
+    proxy_pass              http://prometheus/prometheus/;
+
+    proxy_set_header        Host $host;
+    proxy_set_header        X-Real-IP $remote_addr;
+    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header        X-Forwarded-Proto $scheme;
+    proxy_http_version      1.1;
+    proxy_redirect          off;
+    proxy_set_header        Connection "Keep-Alive";
+    proxy_set_header        Proxy-Connection "Keep-Alive";
+
+    {% for allowed_ip in monitoring_allowed_ips | default(['212.227.252.235']) %}
+    allow {{ allowed_ip }};
+    {% endfor %}
+    deny all;
+  }
+
+}
+
+# Allow longer domain names
+server_names_hash_bucket_size  128;
+
+# vim: set expandtab :

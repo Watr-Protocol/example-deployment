@@ -1,0 +1,52 @@
+---
+
+
+- name: "Create/setup system user accounts"
+  user:
+    name: "{{ item.name }}"
+    comment: "{{ item.comment | default(item.name) }}"
+    uid: "{{ item.uid }}"
+    groups: "{{ item.supplementarygroups | default('') }}"
+    create_home: true
+    home: "{{ item.home | default('/home/' + item.name) }}"
+    shell: "{{ item.shell | default(default_shell) }}"
+    password: "{{ item.password | default ('!') }}"
+    state: present
+  loop: "{{ system_users_active }}"
+
+- name: ensure /etc/ssh/authorized_keys directory exists
+  file:
+    path: /etc/ssh/authorized_keys
+    owner: root
+    group: root
+    mode: 0755
+    state: directory
+
+- name: Set up active user's ssh keys at /etc/ssh/authorized_keys
+  copy:
+    dest: "/etc/ssh/authorized_keys/{{ item.name }}.keys"
+    content: "{{ item.authorized_keys }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ system_users_active }}"
+  when: item.authorized_keys is defined
+
+- name: Remove inactive user's keys from /etc/ssh/authorized_keys
+  file:
+    path: /etc/ssh/authorized_keys/{{ item }}.keys
+    state: absent
+  loop: "{{ system_users_inactive }}"
+
+
+
+- name: ensure only active keys are in /etc/ssh/authorized_keys (find)
+  find:
+    paths: /etc/ssh/authorized_keys
+    patterns: "*.keys"
+  register: keys
+  tags: keys_debug
+
+- set_fact: keys_paths="{{ keys.files | map(attribute='path') | list }}"
+  tags: keys_debug
+

@@ -1,0 +1,25 @@
+---
+- name: Install apt-cacher-ng packages
+  apt:
+    pkg: apt-cacher-ng
+    state: present
+    autoclean: yes
+
+- name: Setup the apt-cacher directory if needed
+  file:
+    path: /etc/apt-cacher-ng
+    state: directory
+    mode: 0644
+
+- name: Enable https passthrough
+  copy:
+    content: "PassThroughPattern: ^(.*):443$"
+    dest: /etc/apt-cacher-ng/passthrough.conf
+    mode: 0644
+  register: passthrough
+
+- name: Restart the apt cacher
+  systemd:
+    state: restarted
+    name: apt-cacher-ng
+  when: passthrough.changed

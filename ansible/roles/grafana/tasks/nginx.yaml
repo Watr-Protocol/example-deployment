@@ -1,0 +1,83 @@
+# certbot.yaml
+#
+# for these tasks and certbot to work the instance should assume a role which
+# allows ListHostedZones, ListResourceRecordSets, ChangeResourceRecordSets on
+# the hosted zone e.g. Z0158602OPJY3TTHL5FA
+---
+
+- name: Update deb package list
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install nginx-light
+  apt:
+    name:
+      - nginx-light
+    state: present
+  register: nginx_installed
+
+- name: Install apache2-utils
+  apt:
+    name:
+      - apache2-utils
+    state: present
+
+- name: Ensure config directory exists
+  file:
+    path: /etc/nginx/conf.d
+    state: directory
+    mode: 0644
+
+- name: Create dhparam
+  command:
+    cmd: openssl dhparam -out /etc/nginx/dhparam.pem 2048
+    creates: /etc/nginx/dhparam.pem
+
+- name: Put grafana's config on the host
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/conf.d/grafana.conf
+    owner: root
+    group: www-data
+    mode: 0640
+  register: configuration
+
+- name: Disable nginx default website on port 80
+  file:
+    state: absent
+    path: /etc/nginx/sites-enabled/default
+
+- name: Check that the htpasswd file exists
+  stat:
+    path: /etc/nginx/htpasswd
+  register: htpasswd_file
+
+- name: Create htpasswd file
+  command:
+    cmd: htpasswd -bc /etc/nginx/htpasswd {{ rpc_user }} {{ rpc_password }}
+    creates: /etc/nginx/htpasswd
+  when: not htpasswd_file.stat.exists
+
+- name: Enable and start nginx server
+  systemd:
+    name: nginx
+    enabled: true
+    state: restarted
+  when: configuration.changed
+
+- name: Deploy post renewal certbot hook - create directory
+  file:
+    path: /etc/letsencrypt/renewal-hooks/post
+    state: directory
+    mode: 0754
+
+- name: Deploy post renewal certbot hook - reload script
+  copy:
+    content: |
+      #!/bin/sh
+      systemctl reload nginx
+    dest: /etc/letsencrypt/renewal-hooks/post/nginx
+    owner: root
+    group: root
+    mode: 0754
