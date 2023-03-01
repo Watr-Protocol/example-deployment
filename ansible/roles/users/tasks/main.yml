@@ -32,14 +32,6 @@
   loop: "{{ system_users_active }}"
   when: item.authorized_keys is defined
 
-- name: Remove inactive user's keys from /etc/ssh/authorized_keys
-  file:
-    path: /etc/ssh/authorized_keys/{{ item }}.keys
-    state: absent
-  loop: "{{ system_users_inactive }}"
-
-
-
 - name: ensure only active keys are in /etc/ssh/authorized_keys (find)
   find:
     paths: /etc/ssh/authorized_keys
