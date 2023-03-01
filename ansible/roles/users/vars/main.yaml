@@ -6,19 +6,10 @@ default_shell: /bin/bash
 
 
 system_users_active:
-  - name: davidd
-    comment: "David Dorgan"
-    uid: 2003
+  - name: username
+    comment: "User Name"
+    uid: 2000
     home: /home/davidd
     supplementarygroups: "ssh,sudo"
-    authorized_keys: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAH94dIJB5ZB9AC8zP+in8cJbBmhhjykxIHYrbmt1gLIIMFlJIzKISR7+WQommezZfO0rYAnMuZi2kZpp/5Gfe3B+0U/hD51cOt5Gx6ndARgyL81WeniJp/V5tsgOVAWgJzOzi8Mvi1mHXQ2egfwe3vWYNAQqZl0ibXB6k7syXh/lXoFz3Qa8uH2XU+3qEA/yzpsUKDw1J6XhsUU8gUMQjyYMw/ppkVJTLtctydMsidBamp8a9u39gPRNnsJFUpX3FcNdFx74dRcrqx/R3qBqNA6mCGbJVHXv7L5kLlwS5rxE6Sbw9WrU3+nRE4Vv2n8LP3EKe+5jf4WDvCbMOTA0B davidd@x"
-
-  - name: denisp
-    comment: "Denis P"
-    uid: 2004
-    home: /home/denisp
-    supplementarygroups: "ssh,sudo"
-    authorized_keys: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCR+tSxyjea9ejdWjvS3ukCs7GUsXVRCJsHrqDL3mZvL2DDspD88cDp1jNCVp2av63TSTdpShL/p+/iwEeY/wuAf28FZ+lEctMn16gLT0qebluTtLB+8pl6fb458CWGXK3TBiV1fPaVcOCcpJcmatmWMAC9Oy14XEk+EJKgj8IVKIYRKysZQnXrDvSXWMkDmiNxgpVcauyGLSoR1cLqn15JQIjtQVUf1G/7/OXfEvGGdqadiV20+H7TYpNl0MUQwniJUhDZeMkC+I6PhTKTdwJarZ44QAjIVZ3ukZdoKEb6ZQTCzIHPFwyyZHXSE3jWNVpAG0LKedCLYA3eo3bX3bRAndmZtCoLf1fRU+YGP0Zwm9ZLc74P0AIWruuqZbA6c8fVITrQtPcucer8mwRj/Q0avChwex3+K61z4yR6shEkieSmnZSMKc9HP+eb3G4bvSEQz4FBcf6Qt88X8LKYWOLeinB7XQ9w7DdYehd/a5Te5MnJ3qHeuN9XbzoBZIbY+4edYSCFJNFWkUSWvoypwAyC5abCyn9Zqt6CRE0HmTtaIEYPkauQMI3Awxf5ap+Tmw+DYFuRUzJy/AN/UOQ9vxgf/JUdOLUXU9ciYyuczKPKzuOyYn8Mi5g5SZcihhDOfFnLCrvZogCFNqruSnRKnbb3wqP4heseb5TI9/8XMje7cQ== denisp@parity.io"
-
-system_users_inactive:
+    authorized_keys: "ssh-rsa xxxx"
 
