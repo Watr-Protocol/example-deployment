@@ -30,7 +30,7 @@ vpc_peerings = {}
 vpc_peerings_to_accept = {}
 
 # Instances
-# ec2_ssh_public_key            = "" # some ssh bootstrap key
+ec2_ssh_public_key            = "" # some ssh bootstrap key
 enable_volume_snapshot_policy = false
 
 monitoring = {
@@ -97,5 +97,3 @@ backup_nodes = {}
 load_balancers = {}
 
 archive_nodes = {}
-
-ec2_ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDRBe+pgD0IkPkHXBYTw6fLzybcLBhoKF24cL8e/CgtFjZzPTo3zQIKbz+3NcjF9S72jIFwdNtPLYt//xbXTwUAl+IJqKHBeQQHpWHsHm0yXecocm0Sjd+PKphYW0Tz+85ebGlY3kjahpmbBhv4shN5CbEBqxgtOLb0U+v8Y0insDH6yyjl0h+exzrTMuOqCmwNXE0Eqr3HJRgtrPv47nnQ8gFfkA3WEbHGene4vylEblIA7w8O1oDaw6GoojdsZCztluuHV+TN/07NAlhss52qfBzOiChh+xWnphggysrFLsZVBHQNun6E1L67PbCRPhDuGcPNw1xp/e1g7WNHKWg6/Oq+ilVw++RpE+QDGt42x2esSduMHBfXAhe5pQb9CmwgG86z50U+DZ4d/JYsjGTixDjleGZjihFiW+zgP0UhtDXM0MuxmGKi5csV6m2TQ7xFZdxXNT2u7y4SX+TOAIAduoUNNPFLom2ZR+N3tmS908siVhmRR/TmcvPub8fhHQbXX8YAu1hSP+cSbjcm1qEey9A9+KQxNc5A+0dd+J3E5d4R9ya84r7hpg1elTLHDnsXnAaCxrn498I0tj76RnnHFSr2IQs52KZOe92Y03jLJtek4GlKn0mbefEmAyIE6btjzOniegVBe5L3NJZ/8f0pmSh/0U5470JkUv9d1h+UcQ== cardno:11 513 686"
