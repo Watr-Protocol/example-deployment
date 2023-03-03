@@ -1,7 +1,7 @@
 ---
 
 
-- name: "Create/setup system user accounts"
+- name: Create/setup system user accounts
   user:
     name: "{{ item.name }}"
     comment: "{{ item.comment | default(item.name) }}"
@@ -14,7 +14,7 @@
     state: present
   loop: "{{ system_users_active }}"
 
-- name: ensure /etc/ssh/authorized_keys directory exists
+- name: Ensure /etc/ssh/authorized_keys directory exists
   file:
     path: /etc/ssh/authorized_keys
     owner: root
@@ -32,13 +32,13 @@
   loop: "{{ system_users_active }}"
   when: item.authorized_keys is defined
 
-- name: ensure only active keys are in /etc/ssh/authorized_keys (find)
+- name: Ensure only active keys are in /etc/ssh/authorized_keys (find)
   find:
     paths: /etc/ssh/authorized_keys
     patterns: "*.keys"
   register: keys
   tags: keys_debug
 
-- set_fact: keys_paths="{{ keys.files | map(attribute='path') | list }}"
+- name: Set fact keys_paths (debug)
+  set_fact: keys_paths="{{ keys.files | map(attribute='path') | list }}"
   tags: keys_debug
-

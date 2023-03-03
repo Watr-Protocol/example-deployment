@@ -1,49 +1,49 @@
 ---
 
-- name: check if binary is already present
+- name: Check if binary is already present
   stat:
     path: "{{ loki_binary_path }}"
   register: loki_binary
 
-- name: get loki binary
+- name: Get loki binary
+  when: not loki_binary.stat.exists or loki_refresh_binary is defined and loki_refresh_binary
   block:
 
-    - name: make temporary download folder
+    - name: Make temporary download folder
       tempfile:
         state: directory
         suffix: ".loki"
       register: download_dir
 
-    - name: download loki binary
+    - name: Download loki binary
       get_url:
         url: "{{ loki_download_url }}"
         dest: "{{ download_dir.path }}/{{ loki_download_url | basename }}"
         mode: 644
 
-    - name: unarchive loki binary
+    - name: Unarchive loki binary
       unarchive:
         src: "{{ download_dir.path }}/{{ loki_download_url | basename }}"
-        dest: "{{ download_dir.path}}"
+        dest: "{{ download_dir.path }}"
         remote_src: yes
 
-    - name: move binary in place
+    - name: Move binary in place
       copy:
         remote_src: yes
-        src: "{{ download_dir.path}}/loki-linux-amd64"
+        src: "{{ download_dir.path }}/loki-linux-amd64"
         dest: "{{ loki_binary_path }}"
         mode: 0755
         owner: root
         group: root
       register: loki_binary_changed
 
-    - name: remove temporary download folder
+    - name: Remove temporary download folder
       file:
-        path: "{{ download_dir.path}}"
+        path: "{{ download_dir.path }}"
         state: absent
-  when: not loki_binary.stat.exists or loki_refresh_binary is defined and loki_refresh_binary
 
 
-- name: create loki system user
+- name: Create loki system user
   user:
     name: loki
     shell: /usr/sbin/nologin
@@ -51,7 +51,7 @@
     system: yes
     state: present
 
-- name: ensure data directory exists with the proper permissions
+- name: Ensure data directory exists with the proper permissions
   file:
     path: "{{ loki_data_dir }}"
     state: directory
@@ -60,7 +60,7 @@
     mode: 0750
 
 
-- name: ensure config directory exists
+- name: Ensure config directory exists
   file:
     path: "{{ loki_config_path | dirname }}"
     state: directory
@@ -69,7 +69,7 @@
     mode: 0755
 
 
-- name: render loki configuration
+- name: Render loki configuration
   template:
     src: loki.yaml.j2
     dest: "{{ loki_config_path }}"
@@ -80,7 +80,7 @@
 
 # Note: the "fake" folder is on purpose and correspond to the default Loki/Cortex Tenant ID
 # See https://grafana.com/docs/loki/latest/alerting/#interacting-with-the-ruler
-- name: ensure alerting rule directory exists
+- name: Ensure alerting rule directory exists
   file:
     path: "{{ loki_alerting_rules_path }}/fake"
     state: directory
@@ -88,7 +88,7 @@
     group: root
     mode: 0755
 
-- name: render loki alerting rule configuration
+- name: Render loki alerting rule configuration
   template:
     src: alerting_rules.yaml.j2
     dest: "{{ loki_alerting_rules_path }}/fake/alerting_rules.yaml"
@@ -97,7 +97,7 @@
     group: root
   register: loki_alerting_rules
 
-- name: render default environment variables
+- name: Render default environment variables
   template:
     src: default.j2
     dest: /etc/default/loki
@@ -106,7 +106,7 @@
     group: root
   register: defaults
 
-- name: render systemd unit file
+- name: Render systemd unit file
   template:
     src: loki.service.j2
     dest: /etc/systemd/system/loki.service
@@ -116,13 +116,13 @@
   register: systemd
 
 
-- name: reload systemd
+- name: Reload systemd
   systemd:
     daemon_reload: yes
   when: systemd.changed
 
 
-- name: enable and start loki
+- name: Enable and start loki
   systemd:
     name: loki
     enabled: true

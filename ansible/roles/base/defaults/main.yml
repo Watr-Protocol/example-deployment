@@ -2,8 +2,8 @@
 # this is aws default time server
 ntp_server: 169.254.169.123 # AWS Time server
 base_packages:
-  - gpg
-  - git-core
+  - gnupg
+  - git
   - tree
   - curl
   - dnsutils
