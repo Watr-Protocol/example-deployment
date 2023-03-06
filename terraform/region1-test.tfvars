@@ -18,7 +18,7 @@ public_subnets     = ["10.10.101.0/24", "10.10.102.0/24"]
 
 # Allow IP ranges - e.g. vpn server
 //                   Allow all IPs
-ssh_ip_access_list = ["212.227.197.206/32"]
+ssh_ip_access_list = ["x.x.x.x/32"]
 //                          Allow all IPs
 monitoring_ip_access_list = ["0.0.0.0/0"]
 

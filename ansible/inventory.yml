@@ -19,7 +19,7 @@ all:
       hosts:
         region1-monitoring-1:
           ansible_user: admin
-          ansible_host: 13.50.152.66
+          ansible_host: region1-test.mon1.mycompany.com
           # IPs or CIDR ranges allowed to access monitoring (warning: this is in addition to security groups rules)
           domain_name: monitoring.deploy.paritytech.io # find your URL in "route 53" aws console service
           rpc_user: monitoring
@@ -44,7 +44,7 @@ all:
           node_parachain_chain: watr 
           node_parachain_role: rpc
           node_pruning: 0
-          ansible_host: 13.48.30.225
+          ansible_host: region1-test.rpc1.mycompany.com
           node_custom_options: ["--execution wasm"]
 
 
@@ -55,10 +55,10 @@ all:
           node_parachain_role: collator
           node_custom_options: ["--execution wasm"]
           key_inject_parachain_aura_private_key: "0x0" # inject this private aura key
-          ansible_host: 13.50.140.81
+          ansible_host: region1-test.col1.mycompany.com
         region1-collator-2:
           ansible_user: admin
           node_parachain_role: collator
           node_custom_options: ["--execution wasm"]
           key_inject_parachain_aura_private_key: "0x0" # inject this private aura key
-          ansible_host: 13.50.65.107
+          ansible_host: region1-test.col2.mycompany.com

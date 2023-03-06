@@ -1,15 +1,15 @@
 Host region1-test-region1-collator-1
   ProxyJump region1-test-bastion-eu-north-1b
-  HostName 10.10.101.90
+  HostName region1-test.col1.mycompany.com
 
 Host region1-test-region1-collator-2
   ProxyJump region1-test-bastion-eu-north-1c
-  HostName 10.10.2.213
+  HostName region1-test.col2.mycompany.com
 
 Host region1-test-region1-monitoring
   ProxyJump region1-test-bastion-eu-north-1c
-  HostName 10.10.102.83
+  HostName region1-test.mon1.mycompany.com
 
 Host region1-test-region1-test-rpc-1
   ProxyJump region1-test-bastion-eu-north-1b
-  HostName 10.10.101.212
+  HostName region1-test.rpc1.mycompany.com
