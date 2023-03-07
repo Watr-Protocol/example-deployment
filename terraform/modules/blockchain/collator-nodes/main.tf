@@ -71,7 +71,7 @@ module "collator_nodes" {
   allocate_public_ip = true
   root_block_device = [{
     volume_type           = "gp2"
-    volume_size           = 250
+    volume_size           = each.value.root_disk 
     delete_on_termination = true
     encrypted             = true
   }]
