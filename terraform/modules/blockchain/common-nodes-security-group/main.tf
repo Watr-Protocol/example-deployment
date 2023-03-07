@@ -32,7 +32,7 @@ locals {
           port        = 22
           protocol    = "tcp"
           description = "ssh"
-          cidr_blocks = ["212.227.197.206/32"]
+          cidr_blocks = ["${ssh_ip_access_list}"]
         }
       ]
   ])
@@ -61,7 +61,7 @@ locals {
           port        = 22
           protocol    = "tcp"
           description = "ssh"
-          cidr_blocks = ["212.227.197.206/32"]
+          cidr_blocks = ["${ssh_ip_access_list}"]
         }
 
   ]
