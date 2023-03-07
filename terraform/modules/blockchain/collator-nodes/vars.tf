@@ -49,3 +49,8 @@ variable "allocate_public_ip" {
   default     = false
 }
 
+variable "root_disk" {
+   description = "root disk size"
+   type        = map(string)
+   default     = 250
+}
