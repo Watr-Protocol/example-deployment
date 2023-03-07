@@ -22,7 +22,7 @@ ssh_ip_access_list = ["x.x.x.x/32"]
 //                          Allow all IPs
 monitoring_ip_access_list = ["0.0.0.0/0"]
 
-public_dns_zone  = "deploy.paritytech.io"
+public_dns_zone  = "region1-test.mycompany.com"
 private_dns_zone = "region1-test.internal"
 
 // Peering

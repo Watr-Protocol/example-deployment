@@ -21,7 +21,7 @@ all:
           ansible_user: admin
           ansible_host: region1-test.mon1.mycompany.com
           # IPs or CIDR ranges allowed to access monitoring (warning: this is in addition to security groups rules)
-          domain_name: monitoring.deploy.paritytech.io # find your URL in "route 53" aws console service
+          domain_name: monitoring.region1-test.mycompany.com # find your URL in "route 53" aws console service
           rpc_user: monitoring
           rpc_password: xxxxxxxxxxxxxx # some password
           smtp_to: admin@mycompany.com
