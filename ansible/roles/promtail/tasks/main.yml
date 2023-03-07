@@ -1,46 +1,46 @@
 ---
-- name: check if binary is already present
+- name: Check if binary is already present
   stat:
     path: "{{ promtail_binary_path }}"
   register: promtail_binary
 
-- name: get promtail binary
+- name: Get promtail binary
+  when: not promtail_binary.stat.exists or promtail_refresh_binary is defined and promtail_refresh_binary
   block:
-    - name: make temporary download folder
+    - name: Make temporary download folder
       tempfile:
         state: directory
         suffix: .promtail
       register: download_dir
 
-    - name: download promtail binary
+    - name: Download promtail binary
       get_url:
         url: "{{ promtail_download_url }}"
         dest: "{{ download_dir.path }}/{{ promtail_download_url | basename }}"
         mode: 644
 
-    - name: unarchive promtail binary
+    - name: Unarchive promtail binary
       unarchive:
         src: "{{ download_dir.path }}/{{ promtail_download_url | basename }}"
-        dest: "{{ download_dir.path}}"
+        dest: "{{ download_dir.path }}"
         remote_src: yes
 
-    - name: move binary in place
+    - name: Move binary in place
       copy:
         remote_src: yes
-        src: "{{ download_dir.path}}/promtail-linux-amd64"
+        src: "{{ download_dir.path }}/promtail-linux-amd64"
         dest: "{{ promtail_binary_path }}"
         mode: 0755
         owner: root
         group: root
       register: promtail_binary_changed
 
-    - name: remove temporary download folder
+    - name: Remove temporary download folder
       file:
-        path: "{{ download_dir.path}}"
+        path: "{{ download_dir.path }}"
         state: absent
-  when: not promtail_binary.stat.exists or promtail_refresh_binary is defined and promtail_refresh_binary
 
-- name: create promtail system user
+- name: Create promtail system user
   user:
     name: promtail
     shell: /usr/sbin/nologin
@@ -50,7 +50,7 @@
     groups:
       - systemd-journal
 
-- name: ensure data directory exists with the proper permissions
+- name: Ensure data directory exists with the proper permissions
   file:
     path: "{{ promtail_data_dir }}"
     state: directory
@@ -58,7 +58,7 @@
     group: promtail
     mode: 0750
 
-- name: ensure config directory exists
+- name: Ensure config directory exists
   file:
     path: "{{ promtail_config_path | dirname }}"
     state: directory
@@ -66,7 +66,7 @@
     group: root
     mode: 0755
 
-- name: render promtail configuration
+- name: Render promtail configuration
   template:
     src: promtail.yaml.j2
     dest: "{{ promtail_config_path }}"
@@ -75,7 +75,7 @@
     group: root
   register: promtail_config
 
-- name: render default environment variables
+- name: Render default environment variables
   template:
     src: default.j2
     dest: /etc/default/promtail
@@ -84,7 +84,7 @@
     group: root
   register: defaults
 
-- name: render systemd unit file
+- name: Render systemd unit file
   template:
     src: promtail.service.j2
     dest: /etc/systemd/system/promtail.service
@@ -93,12 +93,12 @@
     group: root
   register: systemd
 
-- name: reload systemd
+- name: Reload systemd
   systemd:
     daemon_reload: yes
   when: systemd.changed
 
-- name: enable and start promtail
+- name: Enable and start promtail
   systemd:
     name: promtail
     enabled: true

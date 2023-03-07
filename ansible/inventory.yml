@@ -11,26 +11,25 @@ all:
     node_app_name: watr
     node_chain: rococo
     node_parachain_chainspec: https://raw.githubusercontent.com/Watr-Protocol/watr/main/chain-specs/devnet-raw.json # chain spec file if required
-    node_binary: "https://github.com/Watr-Protocol/watr/releases/download/v1.2.0/watr-node" # release binary to run on all nodes
+    node_binary: "https://github.com/Watr-Protocol/watr/releases/download/v1.2.0/watr-v1.2.0" # release binary to run on all nodes
 
   children:
     bastions: {}
     monitoring:
       hosts:
         region1-monitoring-1:
-          ansible_user: ubuntu
-          ansible_host: region1-monitoring-1.mycompany.com
+          ansible_user: admin
+          ansible_host: region1-test.mon1.mycompany.com
           # IPs or CIDR ranges allowed to access monitoring (warning: this is in addition to security groups rules)
-          domain_name: monitoring.mycompany.com
+          domain_name: monitoring.region1-test.mycompany.com # find your URL in "route 53" aws console service
           rpc_user: monitoring
           rpc_password: xxxxxxxxxxxxxx # some password
           smtp_to: admin@mycompany.com
           monitoring_allowed_ips:
-            - 'x.x.x.x' # Some allowed VPN endpoint
+            - '0.0.0.0' # Some allowed VPN endpoint
           prometheus_retention_days: 31 # 1 months
           prometheus_source: bullseye
           loki_retention_period: 672h # 4 weeks
-          rpc_user: region1
           additional_scrape_config_ec2: {}
 
     archivenodes: {}
@@ -41,18 +40,25 @@ all:
     accessnodes:
       hosts:
         region1-rpc-us-1:
-          ansible_user: ubuntu
+          ansible_user: admin
           node_parachain_chain: watr 
           node_parachain_role: rpc
           node_pruning: 0
-          ansible_host: test-region1-rpc-1.mycompany.com
+          ansible_host: region1-test.rpc1.mycompany.com
           node_custom_options: ["--execution wasm"]
 
 
     collators: # example collator with injected aura private key
       hosts:
         region1-collator-1:
+          ansible_user: admin
           node_parachain_role: collator
           node_custom_options: ["--execution wasm"]
           key_inject_parachain_aura_private_key: "0x0" # inject this private aura key
-          ansible_host: region1-collator-1.mycompany.com
+          ansible_host: region1-test.col1.mycompany.com
+        region1-collator-2:
+          ansible_user: admin
+          node_parachain_role: collator
+          node_custom_options: ["--execution wasm"]
+          key_inject_parachain_aura_private_key: "0x0" # inject this private aura key
+          ansible_host: region1-test.col2.mycompany.com

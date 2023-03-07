@@ -12,4 +12,3 @@ system_users_active:
     home: /home/davidd
     supplementarygroups: "ssh,sudo"
     authorized_keys: "ssh-rsa xxxx"
-

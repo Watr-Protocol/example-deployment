@@ -1,11 +1,11 @@
 ---
 
-- name: update deb package list
+- name: Update deb package list
   apt:
     update_cache: yes
     cache_valid_time: 3600
 
-- name: install the package
+- name: Install the package
   apt:
     name:
       - prometheus-alertmanager
@@ -14,13 +14,13 @@
   register: installed
 
 
-- name: put prometheus-alertmanager' default config on the host
+- name: Put prometheus-alertmanager' default config on the host
   template:
     src: default.j2
     dest: /etc/default/prometheus-alertmanager
   register: defaults
 
-- name: put prometheus-alertmanager' config on the host
+- name: Put prometheus-alertmanager' config on the host
   template:
     src: alertmanager.yml.j2
     dest: /etc/prometheus/alertmanager.yml
@@ -31,7 +31,7 @@
   tags: alertmanager-config
 
 
-- name: ensure alertmanager's template directory exists
+- name: Ensure alertmanager's template directory exists
   file:
     path: /etc/prometheus/alertmanager_templates
     state: directory
@@ -40,7 +40,7 @@
     mode: 0755
   tags: alertmanager-config
 
-- name: set config for amtool
+- name: Set config for amtool
   copy:
     content: |
       {% if domain_name is defined %}
@@ -51,17 +51,16 @@
     dest: /etc/prometheus/amtool.yml
   tags: amtool-config
 
-- name: restart and enable prometheus-alertmanager server
+- name: Restart and enable prometheus-alertmanager server
   systemd:
     enabled: true
     state: restarted
     name: prometheus-alertmanager
   when: (installed is defined and installed.changed) or (defaults is defined and defaults.changed)
 
-- name: reload configuration of prometheus-alertmanager server
+- name: Reload configuration of prometheus-alertmanager server
   systemd:
     state: reloaded
     name: prometheus-alertmanager
   when: ((installed is undefined or not installed.changed) and (defaults is undefined or not defaults.changed)) and configuration.changed
   tags: alertmanager-config
-
