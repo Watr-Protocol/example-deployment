@@ -58,6 +58,11 @@ variable "monitoring_ip_access_list" {
   type        = list(string)
 }
 
+variable "ssh_ip_access_list" {
+  description = "CIDR list of allowed IPs for monitoring access"
+  type        = list(string)
+}
+
 variable "tags" {
   description = "A list of tags"
   type        = map(string)
