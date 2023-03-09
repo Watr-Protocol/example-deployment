@@ -1,23 +1,13 @@
 locals {
-  bastion_ip_ingress_rules = [for bastion_ip in var.bastion_ips : {
+  ingress_ssh_rules = [for cidr in var.ssh_ip_access_list : {
     port        = 22
     protocol    = "tcp"
     description = "ssh"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [cidr]
   }]
 
-  # hack fixme
-  monitoring_ip_access_list_rules = [
-    {
-      port        = 22
-      protocol    = "tcp"
-      description = "ssh"
-      cidr_blocks = ["${ssh_ip_access_list}"]
-    }
-  ]
   ingress_rules = concat(
-    local.bastion_ip_ingress_rules,
-    local.monitoring_ip_access_list_rules,
+    local.ingress_ssh_rules,
     [
       {
         port        = 3100

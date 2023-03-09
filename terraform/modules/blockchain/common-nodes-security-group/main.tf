@@ -1,10 +1,10 @@
 locals {
   // Open SSH connection from Bastions
-  ingress_bastion_rules = [for bastion_ip in var.bastion_ips : {
+  ingress_ssh_rules = [for cidr in var.ssh_ip_access_list : {
     port        = 22
     protocol    = "tcp"
     description = "ssh"
-    cidr_blocks = ["${bastion_ip}/32"]
+    cidr_blocks = [cidr]
   }]
 
   // Open scraping metrics and logs endpoints from the Monitoring servers
@@ -27,12 +27,6 @@ locals {
           protocol    = "tcp"
           description = "promtail"
           cidr_blocks = ["${monitoring_ip}/32"]
-        },
-        {
-          port        = 22
-          protocol    = "tcp"
-          description = "ssh"
-          cidr_blocks = ["${ssh_ip_access_list}"]
         }
       ]
   ])
@@ -56,14 +50,7 @@ locals {
       protocol    = "udp"
       description = "mdns"
       cidr_blocks = [var.vpc_cidr_block]
-    },
-   {
-          port        = 22
-          protocol    = "tcp"
-          description = "ssh"
-          cidr_blocks = ["${ssh_ip_access_list}"]
-        }
-
+    }
   ]
 
   // Add rules to allow traffic to peered VPCs collator nodes
@@ -87,7 +74,7 @@ locals {
   )
 
   ingress_rules = concat(
-    local.ingress_bastion_rules,
+    local.ingress_ssh_rules,
     local.ingress_monitoring_rules,
     local.ingress_generic_rules,
     local.peering_vpc_rules

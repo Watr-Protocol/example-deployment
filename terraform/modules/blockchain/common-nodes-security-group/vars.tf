@@ -37,3 +37,8 @@ variable "tags" {
   description = "A list of tags"
   type        = map(string)
 }
+
+variable "ssh_ip_access_list" {
+  description = "CIDR list of allowed IPs for SSH access"
+  type        = list(string)
+}
