@@ -232,12 +232,12 @@ module "custom_load_balancer" {
 
   load_balancers = var.load_balancers
 
-  name                        = "${var.environment}-rpc-lb"
-  environment                 = var.environment
-  vpc_id                      = module.vpc.vpc_id
-  private_subnet_ids          = module.vpc.private_subnet_ids
-  public_dns_zone             = var.public_dns_zone
-  public_dns_zone_id          = module.dns_zones.public_zone_id
+  name               = "${var.environment}-rpc-lb"
+  environment        = var.environment
+  vpc_id             = module.vpc.vpc_id
+  private_subnet_ids = module.vpc.private_subnet_ids
+  public_dns_zone    = var.public_dns_zone
+  public_dns_zone_id = module.dns_zones.public_zone_id
 
   tags = var.global_tags
 }

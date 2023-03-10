@@ -1,3 +1,20 @@
+resource "random_string" "this" {
+  length  = 4
+  special = false
+}
+
+module "cloudwatch" {
+  source      = "../cloudwatch"
+  // Workaround with ${random_string.this.result}() to avoid name collision
+  role_name   = "cloudwatch-${random_string.this.result}"
+  environment = var.environment
+}
+
+resource "aws_iam_instance_profile" "this" {
+  name = "ec2-instance-profile-${random_string.this.result}"
+  role = module.cloudwatch.role_name
+}
+
 locals {
   user_data = templatefile("install_cloudwatch.sh", {
     ssm_cloudwatch_config = aws_ssm_parameter.cloudwatch_agent.name
