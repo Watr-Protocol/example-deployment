@@ -1,3 +1,17 @@
+locals {
+  user_data = templatefile("install_cloudwatch.sh", {
+    ssm_cloudwatch_config = aws_ssm_parameter.cloudwatch_agent.name
+  })
+}
+
+resource "aws_ssm_parameter" "cloudwatch_agent" {
+  description = "Cloudwatch agent config to configure custom log"
+  name        = "/cloudwatch-agent/config"
+  type        = "String"
+  value       = file("amazon-cloudwatch-agent.json")
+  overwrite   = true
+}
+
 // Allocate a fixed network interface for the instance with the specified subnet and security group
 resource "aws_network_interface" "default_network_interface" {
   subnet_id       = tolist(data.aws_subnet_ids.subnet_ids.ids)[0]
@@ -30,9 +44,10 @@ resource "aws_instance" "ec2_instance" {
     }
   }
 
-  key_name                = var.key_pair
-  monitoring              = true
-  iam_instance_profile    = var.iam_instance_profile
+  key_name             = var.key_pair
+  monitoring           = true
+  iam_instance_profile = aws_iam_instance_profile.this.name
+  user_data            = local.user_data
 
   tags = merge(var.tags, { "Name" = var.name })
 }
@@ -86,4 +101,3 @@ resource "aws_volume_attachment" "data_disk_attachment" {
   instance_id = aws_instance.ec2_instance.id
   device_name = "/dev/sdh"
 }
-

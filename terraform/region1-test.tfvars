@@ -22,11 +22,12 @@ ssh_ip_access_list = ["x.x.x.x/32"]
 //                          Allow all IPs
 monitoring_ip_access_list = ["0.0.0.0/0"]
 
-public_dns_zone  = "region1-test.mycompany.com"
+# public_dns_zone  = "region1-test.mycompany.com"
+public_dns_zone  = "deploy.paritytech.io"
 private_dns_zone = "region1-test.internal"
 
 // Peering
-vpc_peerings = {}
+vpc_peerings           = {}
 vpc_peerings_to_accept = {}
 
 # Instances
@@ -40,7 +41,7 @@ monitoring = {
     instance_type : "t3.small"
     subnet : "public"
     availability_zone : "eu-north-1c"
-    volume_size_gb : 50 
+    volume_size_gb : 50
   }
 }
 monitoring_database_enabled = false
@@ -81,6 +82,7 @@ collator_nodes = {
     availability_zone : "eu-north-1b"
     volume_size_gb : 50
     provisioned_iops : 100
+    root_disk : 400
   },
   "region1-collator-2" : {
     ami : "ami-02c68996dd3d909c1" // Debian 11
@@ -89,6 +91,7 @@ collator_nodes = {
     availability_zone : "eu-north-1c"
     volume_size_gb : 50
     provisioned_iops : 100
+    root_disk : 400
   }
 }
 

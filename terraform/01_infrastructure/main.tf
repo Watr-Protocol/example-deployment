@@ -76,19 +76,6 @@ module "bastions" {
 ####################
 #    Monitoring    #
 ###################
-
-module "cloudwatch" {
-  source = "../modules/cloudwatch"
-
-  monitoring = var.monitoring
-
-  name                      = "${var.environment}-cloudwatch"
-  environment               = var.environment
-  aws_region                = var.aws_region
-
-  tags = var.global_tags
-}
-
 module "monitoring" {
   source = "../modules/monitoring"
 
@@ -105,6 +92,7 @@ module "monitoring" {
   public_dns_zone           = var.public_dns_zone
   public_dns_zone_id        = module.dns_zones.public_zone_id
   private_dns_zone_id       = module.dns_zones.private_zone_id
+  ssh_ip_access_list        = var.ssh_ip_access_list
 
   tags = var.global_tags
 }
@@ -140,10 +128,9 @@ module "common_nodes_security_group" {
   monitoring_ips         = module.monitoring.monitoring_private_ips
   vpc_peerings           = var.vpc_peerings
   vpc_peerings_to_accept = var.vpc_peerings_to_accept
+  ssh_ip_access_list     = var.ssh_ip_access_list
 
   tags = var.global_tags
-
-
 }
 
 ####################
