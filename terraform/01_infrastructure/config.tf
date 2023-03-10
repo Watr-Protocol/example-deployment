@@ -1,7 +1,5 @@
 terraform {
-  required_version = "~>1.0.0"
-
-  experiments = [module_variable_optional_attrs]
+  required_version = "~>1.3.8"
 
   backend "s3" {
     workspace_key_prefix = "01_infrastructure"
