@@ -76,6 +76,19 @@ module "bastions" {
 ####################
 #    Monitoring    #
 ###################
+
+module "cloudwatch" {
+  source = "../modules/cloudwatch"
+
+  monitoring = var.monitoring
+
+  name                      = "${var.environment}-cloudwatch"
+  environment               = var.environment
+  aws_region                = var.aws_region
+
+  tags = var.global_tags
+}
+
 module "monitoring" {
   source = "../modules/monitoring"
 
