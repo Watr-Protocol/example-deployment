@@ -72,6 +72,7 @@ The `node` ansible-galaxy role comes from a paritytech ansible collections repo.
     `ansible-playbook -i inventory.yml -u admin monitoring.yml`
 
     Don't forget changing a default Grafana password after this is successfully applied for the first time.
+    Also, it might be required to setup DNS records for the new monitoring domain.
 
 5. Install parachain binary and configuration:
 

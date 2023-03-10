@@ -189,6 +189,9 @@ module "archive_nodes" {
   tags = var.global_tags
 }
 
+####################
+#  Collator Nodes  #
+####################
 module "collator_nodes" {
   source = "../modules/blockchain/collator-nodes"
 
