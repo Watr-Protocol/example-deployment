@@ -1,0 +1,81 @@
+[agent]
+  collection_jitter = "0s"
+  debug = false
+  flush_interval = "1s"
+  flush_jitter = "0s"
+  hostname = ""
+  interval = "10s"
+  logfile = "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
+  logtarget = "lumberjack"
+  metric_batch_size = 1000
+  metric_buffer_limit = 10000
+  omit_hostname = false
+  precision = ""
+  quiet = false
+  round_interval = false
+
+[inputs]
+
+  [[inputs.disk]]
+    fieldpass = ["used_percent"]
+    tagexclude = ["mode"]
+    [inputs.disk.tags]
+      "aws:StorageResolution" = "true"
+      metricPath = "metrics"
+
+  [[inputs.logfile]]
+    destination = "cloudwatchlogs"
+    file_state_folder = "/opt/aws/amazon-cloudwatch-agent/logs/state"
+
+    [[inputs.logfile.file_config]]
+      file_path = "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
+      from_beginning = true
+      log_group_name = "amazon-cloudwatch-agent.log"
+      log_stream_name = "amazon-cloudwatch-agent.log"
+      pipe = false
+      retention_in_days = -1
+      timezone = "UTC"
+
+    [[inputs.logfile.file_config]]
+      file_path = "/var/log/syslog"
+      from_beginning = true
+      log_group_name = "syslog"
+      log_stream_name = "syslog"
+      pipe = false
+      retention_in_days = -1
+      timezone = "LOCAL"
+    [inputs.logfile.tags]
+      metricPath = "logs"
+
+  [[inputs.mem]]
+    fieldpass = ["used_percent"]
+    [inputs.mem.tags]
+      "aws:StorageResolution" = "true"
+      metricPath = "metrics"
+
+[outputs]
+
+  [[outputs.cloudwatch]]
+    force_flush_interval = "60s"
+    namespace = "CWAgent"
+    region = "us-east-1"
+    tagexclude = ["host", "metricPath"]
+    [outputs.cloudwatch.tagpass]
+      metricPath = ["metrics"]
+
+  [[outputs.cloudwatchlogs]]
+    force_flush_interval = "15s"
+    log_stream_name = "my_log_stream_name"
+    region = "us-east-1"
+    tagexclude = ["metricPath"]
+    [outputs.cloudwatchlogs.tagpass]
+      metricPath = ["logs"]
+
+[processors]
+
+  [[processors.ec2tagger]]
+    ec2_instance_tag_keys = ["aws:autoscaling:groupName"]
+    ec2_metadata_tags = ["ImageId", "InstanceId", "InstanceType"]
+    refresh_interval_seconds = "0s"
+    [processors.ec2tagger.tagpass]
+      metricPath = ["metrics"]
