@@ -6,6 +6,9 @@ resource "aws_network_interface" "default_network_interface" {
   tags = merge(var.tags, { Name = "${var.name}-eni" })
 }
 
+
+
+
 // Create an EC2 instance
 resource "aws_instance" "ec2_instance" {
   ami           = var.ami

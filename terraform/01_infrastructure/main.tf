@@ -54,6 +54,20 @@ module "key_pair" {
   depends_on = [module.vpc]
 }
 
+#########################
+#  Cloudwatch IAM       #
+#########################
+
+module "cloudwatch" {
+  source      = "../modules/cloudwatch"
+
+  environment         = var.environment
+  cloudwatch_iam_profile   = "${var.environment}-${var.cloudwatch_iam_profile}"
+
+}
+
+
+
 ####################
 #     Bastions     #
 ####################
@@ -62,15 +76,18 @@ module "bastions" {
 
   bastions = var.bastions
 
-  environment         = var.environment
-  vpc_cidr            = var.vpc_cidr
-  vpc_id              = module.vpc.vpc_id
-  ssh_ip_access_list  = var.ssh_ip_access_list
-  key_pair            = module.key_pair.key_pair_id
-  public_dns_zone_id  = module.dns_zones.public_zone_id
-  private_dns_zone_id = module.dns_zones.private_zone_id
+  environment          = var.environment
+  vpc_cidr             = var.vpc_cidr
+  vpc_id               = module.vpc.vpc_id
+  ssh_ip_access_list   = var.ssh_ip_access_list
+  key_pair             = module.key_pair.key_pair_id
+  public_dns_zone_id   = module.dns_zones.public_zone_id
+  private_dns_zone_id  = module.dns_zones.private_zone_id
+  iam_instance_profile = module.cloudwatch.cloudwatch_iam_profile
+
 
   tags = var.global_tags
+
 }
 
 ####################
@@ -87,11 +104,13 @@ module "monitoring" {
   vpc_id                    = module.vpc.vpc_id
   vpc_cidr_block            = var.vpc_cidr
   bastion_ips               = module.bastions.bastion_private_ips
+  ssh_ip_access_list  = var.ssh_ip_access_list
   monitoring_ip_access_list = var.monitoring_ip_access_list
   key_pair                  = module.key_pair.key_pair_id
   public_dns_zone           = var.public_dns_zone
   public_dns_zone_id        = module.dns_zones.public_zone_id
   private_dns_zone_id       = module.dns_zones.private_zone_id
+
 
   tags = var.global_tags
 }
@@ -126,6 +145,7 @@ module "common_nodes_security_group" {
   bastion_ips            = module.bastions.bastion_private_ips
   monitoring_ips         = module.monitoring.monitoring_private_ips
   vpc_peerings           = var.vpc_peerings
+  ssh_ip_access_list     = var.ssh_ip_access_list
   vpc_peerings_to_accept = var.vpc_peerings_to_accept
 
   tags = var.global_tags
@@ -148,6 +168,8 @@ module "validator_nodes" {
   public_dns_zone_id        = module.dns_zones.public_zone_id
   private_dns_zone_id       = module.dns_zones.private_zone_id
   common_security_group_ids = [module.common_nodes_security_group.security_group_id]
+  iam_instance_profile      = module.cloudwatch.cloudwatch_iam_profile
+
 
   tags = var.global_tags
 }
@@ -167,6 +189,8 @@ module "access_nodes" {
   public_dns_zone_id        = module.dns_zones.public_zone_id
   private_dns_zone_id       = module.dns_zones.private_zone_id
   common_security_group_ids = [module.common_nodes_security_group.security_group_id]
+  iam_instance_profile      = module.cloudwatch.cloudwatch_iam_profile
+
 
   tags = var.global_tags
 }
@@ -185,9 +209,15 @@ module "archive_nodes" {
   public_dns_zone_id        = module.dns_zones.public_zone_id
   private_dns_zone_id       = module.dns_zones.private_zone_id
   common_security_group_ids = [module.common_nodes_security_group.security_group_id]
+  iam_instance_profile      = module.cloudwatch.cloudwatch_iam_profile
+
 
   tags = var.global_tags
 }
+
+####################
+#   Collator Nodes #
+####################
 
 module "collator_nodes" {
   source = "../modules/blockchain/collator-nodes"
@@ -201,6 +231,7 @@ module "collator_nodes" {
   public_dns_zone_id        = module.dns_zones.public_zone_id
   private_dns_zone_id       = module.dns_zones.private_zone_id
   common_security_group_ids = [module.common_nodes_security_group.security_group_id]
+  iam_instance_profile      = module.cloudwatch.cloudwatch_iam_profile
 
   tags = var.global_tags
 }
@@ -220,6 +251,8 @@ module "backup_nodes" {
   public_dns_zone_id        = module.dns_zones.public_zone_id
   private_dns_zone_id       = module.dns_zones.private_zone_id
   common_security_group_ids = [module.common_nodes_security_group.security_group_id]
+  iam_instance_profile      = module.cloudwatch.cloudwatch_iam_profile
+
 
   tags = var.global_tags
 }

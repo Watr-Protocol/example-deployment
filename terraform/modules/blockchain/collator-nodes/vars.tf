@@ -54,3 +54,7 @@ variable "root_disk" {
    type        = string
    default     = "400"
 }
+
+variable "iam_instance_profile" {
+  type = string
+}

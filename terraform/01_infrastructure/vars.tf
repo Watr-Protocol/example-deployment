@@ -16,10 +16,15 @@ variable "terraform_state_bucket" {
   type        = string
 }
 
+variable "cloudwatch_iam_profile" {
+  description = "The cloudwatch IAM profile name"
+}
+
 variable "global_tags" {
   description = "The list of tags to attach to the bucket"
   type        = map(string)
 }
+
 ####################
 # Module variables #
 ####################
@@ -135,7 +140,7 @@ variable "archive_nodes" {
 
 variable "collator_nodes" {
   description = "Configuration of the index nodes"
-  type        = map(object({ ami : string, instance_type : string, subnet : string, availability_zone : string, volume_size_gb : number, root_disk: number , provisioned_iops : number, initial_database_disk_snapshot_id : optional(string) }))
+  type        = map(object({ ami : string, instance_type : string, subnet : string, availability_zone : string, volume_size_gb : number, root_disk : number , provisioned_iops : number, initial_database_disk_snapshot_id : optional(string) }))
 }
 
 variable "backup_nodes" {
