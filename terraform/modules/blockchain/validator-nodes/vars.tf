@@ -50,3 +50,9 @@ variable "ssh_ip_access_list" {
   description = "CIDR list of allowed IPs for SSH access"
   type        = list(string)
 }
+
+variable "root_disk" {
+   description = "root disk size"
+   type        = string
+   default     = "400"
+}
