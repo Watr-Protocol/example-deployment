@@ -38,10 +38,11 @@ module "access_nodes" {
   availability_zone = each.value.availability_zone
   root_block_device = [{
     volume_type           = "gp2"
-    volume_size           = 250
+    volume_size           = var.root_disk
     delete_on_termination = true
     encrypted             = true
   }]
+  allocate_public_ip                = true
   data_disk_volume_size_gb          = each.value.volume_size_gb
   data_disk_volume_provisioned_iops = each.value.provisioned_iops
   vpc_id                            = var.vpc_id
