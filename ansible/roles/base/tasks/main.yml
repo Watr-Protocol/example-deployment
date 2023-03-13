@@ -9,7 +9,7 @@
     path: /etc/hosts
     regexp: " {{ inventory_hostname }}( |$)"
     insertafter: ^127.0.0.1
-    line: 127.0.0.2 {{ inventory_hostname }}
+    line: 127.0.0.1 {{ inventory_hostname }}
     state: present
 
 - name: Add inventory nodes to /etc/hosts
@@ -26,14 +26,6 @@
   stat:
     path: /etc/cloud/cloud.cfg
   register: cloud_cfg
-
-- name: Preserve hostname on aws
-  lineinfile:
-    path: /etc/cloud/cloud.cfg
-    regexp: "^preserve_hostname: .*"
-    line: "preserve_hostname: true"
-    state: present
-  when: cloud_cfg.stat.exists
 
 - name: Applying systemd-journald config
   copy:
@@ -55,6 +47,7 @@
     pkg: "{{ query('flattened', ['{{ base_packages }}', '{{ additional_packages }}']) }}"
     state: present
     autoclean: yes
+    update_cache: true
 
 - name: Configure system for chrony
   tags:

@@ -51,3 +51,7 @@ output "blockchain_nodes" {
 output "load_balancers" {
   value = module.custom_load_balancer
 }
+
+output "cloudwatch" {
+  value = module.cloudwatch
+}

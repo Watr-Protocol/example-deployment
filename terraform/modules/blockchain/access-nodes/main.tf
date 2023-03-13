@@ -48,6 +48,8 @@ module "access_nodes" {
   security_group_ids                = concat(var.common_security_group_ids, [module.access_nodes_security_group.security_group_id])
   key_pair                          = var.key_pair
   initial_database_disk_snapshot_id = each.value.initial_database_disk_snapshot_id
+  iam_instance_profile              = var.iam_instance_profile
+
 
   tags = merge(var.tags, {
     BlockchainNodeType : "access-node"

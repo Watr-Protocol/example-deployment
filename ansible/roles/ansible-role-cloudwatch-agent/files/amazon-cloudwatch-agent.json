@@ -1,0 +1,68 @@
+{
+  "agent": {
+    "metrics_collection_interval": 60
+  },
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/syslog",
+            "log_group_name": "syslog",
+            "log_stream_name": "syslog"
+          }
+        ]
+      }
+    }
+  },
+  "metrics": {
+    "metrics_collected": {
+      "mem": {
+        "measurement": [
+          "mem_used_percent"
+        ]
+      },
+      "disk": {
+        "measurement": [
+          "used_percent"
+        ],
+        "resources": [
+          "*"
+        ]
+      },
+      "diskio": {
+        "resources": [
+          "*"
+        ],
+        "measurement": [
+          "reads",
+          "writes",
+          "read_time",
+          "write_time",
+          "io_time"
+        ],
+        "metrics_collection_interval": 60
+      },
+      "statsd": {
+        "metrics_aggregation_interval": 60,
+        "metrics_collection_interval": 10,
+        "service_address": ":8125"
+      },
+      "swap": {
+        "measurement": [
+          "swap_used",
+          "swap_free",
+          "swap_used_percent"
+        ]
+      }
+    },
+    "append_dimensions": {
+      "ImageId": "${aws:ImageId}",
+      "InstanceId": "${aws:InstanceId}",
+      "InstanceType": "${aws:InstanceType}",
+      "AutoScalingGroupName": "${aws:AutoScalingGroupName}"
+    }
+  }
+  
+}
+

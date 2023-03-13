@@ -17,17 +17,19 @@ private_subnets    = ["10.10.1.0/24", "10.10.2.0/24"]
 public_subnets     = ["10.10.101.0/24", "10.10.102.0/24"]
 
 # Allow IP ranges - e.g. vpn server
-//                   Allow all IPs
 ssh_ip_access_list = ["x.x.x.x/32"]
-//                          Allow all IPs
+# Allow all IPs
 monitoring_ip_access_list = ["0.0.0.0/0"]
 
 public_dns_zone  = "region1-test.mycompany.com"
 private_dns_zone = "region1-test.internal"
 
-// Peering
+# Peering
 vpc_peerings = {}
 vpc_peerings_to_accept = {}
+
+# Cloudwatch IAM role for AWS
+cloudwatch_iam_profile = "cloudwatch-iam"
 
 # Instances
 ec2_ssh_public_key            = "" # some ssh bootstrap key
