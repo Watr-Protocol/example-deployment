@@ -55,5 +55,5 @@ variable "ssh_ip_access_list" {
 variable "root_disk" {
    description = "root disk size"
    type        = string
-   default     = "100"
+   default     = "400"
 }
