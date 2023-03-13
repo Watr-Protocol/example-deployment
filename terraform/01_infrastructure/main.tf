@@ -168,6 +168,7 @@ module "validator_nodes" {
   public_dns_zone_id        = module.dns_zones.public_zone_id
   private_dns_zone_id       = module.dns_zones.private_zone_id
   common_security_group_ids = [module.common_nodes_security_group.security_group_id]
+  ssh_ip_access_list        = var.ssh_ip_access_list
   iam_instance_profile      = module.cloudwatch.cloudwatch_iam_profile
 
 
@@ -189,6 +190,7 @@ module "access_nodes" {
   public_dns_zone_id        = module.dns_zones.public_zone_id
   private_dns_zone_id       = module.dns_zones.private_zone_id
   common_security_group_ids = [module.common_nodes_security_group.security_group_id]
+  ssh_ip_access_list        = var.ssh_ip_access_list
   iam_instance_profile      = module.cloudwatch.cloudwatch_iam_profile
 
 
@@ -209,6 +211,7 @@ module "archive_nodes" {
   public_dns_zone_id        = module.dns_zones.public_zone_id
   private_dns_zone_id       = module.dns_zones.private_zone_id
   common_security_group_ids = [module.common_nodes_security_group.security_group_id]
+  ssh_ip_access_list        = var.ssh_ip_access_list
   iam_instance_profile      = module.cloudwatch.cloudwatch_iam_profile
 
 
@@ -231,9 +234,11 @@ module "collator_nodes" {
   public_dns_zone_id        = module.dns_zones.public_zone_id
   private_dns_zone_id       = module.dns_zones.private_zone_id
   common_security_group_ids = [module.common_nodes_security_group.security_group_id]
+  ssh_ip_access_list        = var.ssh_ip_access_list
   iam_instance_profile      = module.cloudwatch.cloudwatch_iam_profile
 
   tags = var.global_tags
+
 }
 
 ####################
@@ -251,6 +256,7 @@ module "backup_nodes" {
   public_dns_zone_id        = module.dns_zones.public_zone_id
   private_dns_zone_id       = module.dns_zones.private_zone_id
   common_security_group_ids = [module.common_nodes_security_group.security_group_id]
+  ssh_ip_access_list        = var.ssh_ip_access_list
   iam_instance_profile      = module.cloudwatch.cloudwatch_iam_profile
 
 

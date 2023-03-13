@@ -46,3 +46,8 @@ variable "tags" {
 variable "iam_instance_profile" {
   type = string
 }
+
+variable "ssh_ip_access_list" {
+  description = "CIDR list of allowed IPs for SSH access"
+  type        = list(string)
+}
