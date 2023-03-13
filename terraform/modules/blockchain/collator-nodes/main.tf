@@ -53,8 +53,6 @@ module "collator_nodes" {
   data_disk_volume_provisioned_iops = each.value.provisioned_iops
   vpc_id                            = var.vpc_id
   security_group_ids                = concat(var.common_security_group_ids, [module.collator_nodes_security_group.security_group_id])
-  //iam_instance_profile              = aws_iam_instance_profile.collator_node_iam_instance_profile.name
-  //iam_instance_profile              = aws_iam_instance_profile.node_iam_instance_role.name
   iam_instance_profile               = var.iam_instance_profile
   key_pair                          = var.key_pair
   initial_database_disk_snapshot_id = each.value.initial_database_disk_snapshot_id
