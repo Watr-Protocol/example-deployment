@@ -42,6 +42,7 @@ module "access_nodes" {
     delete_on_termination = true
     encrypted             = true
   }]
+  allocate_public_ip                = true
   data_disk_volume_size_gb          = each.value.volume_size_gb
   data_disk_volume_provisioned_iops = each.value.provisioned_iops
   vpc_id                            = var.vpc_id
