@@ -1,0 +1,9 @@
+letsencrypt_email: devops-team@parity.io
+nginx_plus_letsencrypt_rpc_port: 9933
+nginx_plus_letsencrypt_rpc_ws_port: 9944
+nginx_plus_letsencrypt_connect_port: 30333
+
+# Choose whether a new certificate should be issued by Let's encrypt or an existing one should be imported.
+# The nginx_letsencrypt_enabled and nginx_import_cloudflare_certificate variables are mutually exclusive:
+nginx_letsencrypt_enabled: false
+nginx_import_cloudflare_certificate: true

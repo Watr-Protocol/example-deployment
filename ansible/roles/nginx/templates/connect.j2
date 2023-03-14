@@ -1,0 +1,34 @@
+upstream websocket {
+  server 127.0.0.1:{{ nginx_plus_letsencrypt_connect_port }};
+}
+
+map $http_upgrade $endpoint {
+  default websocket;
+  '' close;
+}
+
+
+server {
+  listen                443 ssl;
+  server_name           {{ domain_name }};
+    ssl_certificate /etc/letsencrypt/live/{{ domain_name }}/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/{{ domain_name }}/privkey.pem; # managed by Certbot
+
+  location / {
+    limit_req zone=zone burst=10;
+    proxy_buffers 16 4k;
+    proxy_buffer_size 2k;
+    proxy_pass http://$endpoint; 
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";
+    proxy_set_header Host $host;
+   }
+}
+
+server {
+    listen 8080;
+    location = /stub_status {
+      stub_status;
+  }
+}

@@ -1,0 +1,61 @@
+---
+- name: nginx | Upgrade system
+  ansible.builtin.apt: update_cache=yes
+  tags: ['nginx']
+
+- name: nginx | Install nginx
+  ansible.builtin.apt: name=nginx state=present
+  tags: ['nginx']
+
+- name: nginx | Remove default nginx config
+  ansible.builtin.file: name=/etc/nginx/sites-enabled/default state=absent
+  tags: ['nginx']
+
+- name: nginx | Generate dhparams
+  ansible.builtin.command: openssl dhparam -out /etc/nginx/dhparams.pem 2048
+  args:
+    creates: /etc/nginx/dhparams.pem
+  tags: ['nginx']
+
+- name: nginx | copy global config
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    mode: 0644
+  tags: ['nginx']
+
+- name: nginx | Fail if variables are not properly set
+  ansible.builtin.fail:
+    msg: The nginx_letsencrypt_enabled and nginx_import_cloudflare_certificate variables can't have the same value.
+  # todo split line
+  when: (nginx_letsencrypt_enabled | bool and nginx_import_cloudflare_certificate | bool) or (not nginx_letsencrypt_enabled | bool and not nginx_import_cloudflare_certificate | bool) # noqa yaml
+  tags: ['nginx']
+
+# we need to create default website before https, because it used in let's encrypt http challenge
+- name: nginx | add default website
+  ansible.builtin.template:
+    src: nginx-http.j2
+    dest: /etc/nginx/sites-enabled/http
+    mode: 0644
+  tags: ['nginx', 'nginx-letsencrypt', 'nginx-cloudflare']
+
+- name: nginx | Include let's encrypt tasks
+  ansible.builtin.include_tasks: lets_encrypt.yml
+  when: nginx_letsencrypt_enabled | bool
+  tags: ['nginx', 'nginx-letsencrypt']
+
+- name: nginx | Include cloudflare import certificate tasks
+  ansible.builtin.include_tasks: cloudflare.yml
+  when: nginx_import_cloudflare_certificate | bool
+  tags: ['nginx', 'nginx-cloudflare']
+
+- name: nginx | Install nginx site for specified site
+  ansible.builtin.template:
+    src: "{{ nginx_plus_letsencrypt_template | default('rpc.j2') }}"
+    dest: /etc/nginx/sites-enabled/{{ domain_name }}
+    mode: 0644
+  tags: ['nginx', 'nginx-letsencrypt', 'nginx-cloudflare']
+
+- name: nginx | Reload nginx to activate specified site
+  ansible.builtin.service: name=nginx state=restarted
+  tags: ['nginx', 'nginx-letsencrypt', 'nginx-cloudflare']

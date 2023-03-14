@@ -1,0 +1,24 @@
+server_tokens off;
+
+server {
+    listen 80 default_server;
+    server_name {{ domain_name }};
+
+{% if nginx_letsencrypt_enabled %}
+    location /.well-known/acme-challenge {
+        root /var/www/letsencrypt;
+        try_files $uri $uri/ =404;
+    }
+{% endif %}
+
+    location / {
+        rewrite ^ https://{{ domain_name }}$request_uri? permanent;
+    }
+}
+
+server {
+    listen 8080;
+    location = /stub_status {
+      stub_status;
+  }
+}

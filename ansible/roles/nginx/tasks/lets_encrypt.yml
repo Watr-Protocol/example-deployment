@@ -1,0 +1,27 @@
+---
+- block:
+  - name: nginx | install letsencrypt
+    ansible.builtin.apt: name=letsencrypt state=present
+
+  - name: nginx | create letsencrypt directory
+    ansible.builtin.file: name=/var/www/letsencrypt state=directory mode=0755
+
+  - name: nginx | Reload nginx to activate letsencrypt site
+    ansible.builtin.service: name=nginx state=restarted
+    ignore_errors: "{{ ansible_check_mode }}"
+
+  - name: nginx | Create letsencrypt certificate
+    # todo replace to acme_certificate module
+    # noqa command-instead-of-module
+    ansible.builtin.command: letsencrypt certonly -n --webroot -w /var/www/letsencrypt -m {{ letsencrypt_email }} --agree-tos -d {{ domain_name }}
+    args:
+      creates: /etc/letsencrypt/live/{{ domain_name }}
+
+  - name: nginx | copy renewal-hook reload script
+    ansible.builtin.copy:
+      src: reload-nginx-config
+      dest: /etc/letsencrypt/renewal-hooks/deploy
+      owner: root
+      group: root
+      mode: "0744"
+  tags: ['nginx', 'nginx-letsencrypt']

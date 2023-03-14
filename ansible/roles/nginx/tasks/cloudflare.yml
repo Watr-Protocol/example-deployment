@@ -1,0 +1,18 @@
+- block:
+
+  - name: nginx | cloudflare - copy public key
+    ansible.builtin.template:
+      src: "{{ domain_name }}.public"
+      dest: "/etc/ssl/private/{{ domain_name }}.pem"
+      owner: root
+      group: root
+      mode: "0600"
+
+  - name: nginx | cloudflare - copy private key
+    ansible.builtin.template:
+      src: "{{ domain_name }}.private"
+      dest: "/etc/ssl/private/{{ domain_name }}.key"
+      owner: root
+      group: root
+      mode: "0600"
+  tags: ['nginx', 'nginx-cloudflare']
