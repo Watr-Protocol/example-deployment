@@ -1,7 +1,0 @@
----
-- name: Converge
-  hosts: all
-  tasks:
-    - name: Include ansible-role-cloudwatch-agent
-      ansible.builtin.include_role:
-        name: ansible-role-cloudwatch-agent
