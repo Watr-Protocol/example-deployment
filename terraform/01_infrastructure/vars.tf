@@ -145,7 +145,7 @@ variable "collator_nodes" {
 
 variable "backup_nodes" {
   description = "Configuration of the backup nodes"
-  type        = map(object({ ami : string, instance_type : string, subnet : string, availability_zone : string, volume_size_gb : root_disk : number, number, provisioned_iops : number, initial_database_disk_snapshot_id : optional(string), enable_disk_snapshots : bool }))
+  type        = map(object({ ami : string, instance_type : string, subnet : string, availability_zone : string, volume_size_gb : number, root_disk : number, provisioned_iops : number, initial_database_disk_snapshot_id : optional(string), enable_disk_snapshots : bool }))
 }
 
 variable "load_balancers" {
