@@ -59,10 +59,10 @@ module "key_pair" {
 #########################
 
 module "cloudwatch" {
-  source      = "../modules/cloudwatch"
+  source = "../modules/cloudwatch"
 
-  environment         = var.environment
-  cloudwatch_iam_profile   = "${var.environment}-${var.cloudwatch_iam_profile}"
+  environment            = var.environment
+  cloudwatch_iam_profile = "${var.environment}-${var.cloudwatch_iam_profile}"
 
 }
 
@@ -104,7 +104,7 @@ module "monitoring" {
   vpc_id                    = module.vpc.vpc_id
   vpc_cidr_block            = var.vpc_cidr
   bastion_ips               = module.bastions.bastion_private_ips
-  ssh_ip_access_list  = var.ssh_ip_access_list
+  ssh_ip_access_list        = var.ssh_ip_access_list
   monitoring_ip_access_list = var.monitoring_ip_access_list
   key_pair                  = module.key_pair.key_pair_id
   public_dns_zone           = var.public_dns_zone
@@ -270,12 +270,12 @@ module "custom_load_balancer" {
 
   load_balancers = var.load_balancers
 
-  name                        = "${var.environment}-rpc-lb"
-  environment                 = var.environment
-  vpc_id                      = module.vpc.vpc_id
-  private_subnet_ids          = module.vpc.private_subnet_ids
-  public_dns_zone             = var.public_dns_zone
-  public_dns_zone_id          = module.dns_zones.public_zone_id
+  name               = "${var.environment}-rpc-lb"
+  environment        = var.environment
+  vpc_id             = module.vpc.vpc_id
+  private_subnet_ids = module.vpc.private_subnet_ids
+  public_dns_zone    = var.public_dns_zone
+  public_dns_zone_id = module.dns_zones.public_zone_id
 
   tags = var.global_tags
 }

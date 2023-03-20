@@ -18,6 +18,7 @@ variable "terraform_state_bucket" {
 
 variable "cloudwatch_iam_profile" {
   description = "The cloudwatch IAM profile name"
+  type        = string
 }
 
 variable "global_tags" {
