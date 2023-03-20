@@ -35,7 +35,6 @@ resource "aws_instance" "ec2_instance" {
 
   key_name                = var.key_pair
   monitoring              = true
-  cloudwatch              = true
   iam_instance_profile    = var.iam_instance_profile
 
   tags = merge(var.tags, { "Name" = var.name })
