@@ -1,0 +1,84 @@
+---
+- name: Load var file with package URL based on the OS type
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_distribution }}_{{ ansible_distribution_release }}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+      paths:
+        - "{{ role_path }}/vars"
+
+- name: Load tasks file with install tasks based on the OS type
+  ansible.builtin.include_tasks: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - install_{{ ansible_distribution }}_{{ ansible_distribution_release }}.yml
+        - install_{{ ansible_distribution }}.yml
+        - install_{{ ansible_os_family }}.yml
+      paths:
+        - "{{ role_path }}/tasks"
+
+# Install ethtool, since we want to allow this agent to use it to
+# collect information from the ENA if present.
+- name: Install ethtool
+  ansible.builtin.package:
+    name:
+      - ethtool
+
+# Note that we are using a single config file for all instances,
+# regardless of Linux distribution.  This means that the config file
+# may well (and most likely does) reference log files that do not
+# exist on all instances.
+- name: Copy over CloudWatch Agent configuration
+  ansible.builtin.copy:
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+    mode: 0600
+    src: amazon-cloudwatch-agent.json
+
+# The AWS CloudWatch Agent systemd unit kicks off a process that
+# starts the CloudWatch Agent and then dies.  Therefore we can't start
+# it here because it will be started again during the idempotence test
+# and therefore will fail idempotence.
+- name: Enable AWS CloudWatch Agent
+  ansible.builtin.service:
+    enabled: yes
+    name: amazon-cloudwatch-agent
+
+- name: Install rsyslog
+  ansible.builtin.package:
+    name:
+      - rsyslog
+- name: Enable rsyslog
+  ansible.builtin.service:
+    enabled: yes
+    name: rsyslog
+
+# Configure systemd-journald to forward all journal logs to rsyslog,
+# so that the Amazon CloudWatch Agent can in turn forward them to
+# CloudWatch.
+- name: Forward journald log entries to rsyslog
+  ansible.builtin.lineinfile:
+    # This forces lineinfile not to append the line if the regex fails
+    # to match
+    backrefs: yes
+    line: '{{ item.line }}'
+    path: /etc/systemd/journald.conf
+    regexp: '{{ item.regex }}'
+  loop:
+    - {regex: '^#?ForwardToSyslog', line: "ForwardToSyslog=yes"}
+    - {regex: '^#?MaxLevelSyslog', line: "MaxLevelSyslog=debug"}
+- name: ensure data directory exists with the proper permissions
+  file:
+    path: "/var/log/syslog"
+    mode: 0775
+
+- name: restart systemd-journald
+  systemd:
+    name: systemd-journald
+    state: restarted
+
+- name: start
+  ansible.builtin.shell: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start

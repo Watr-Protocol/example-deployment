@@ -1,7 +1,9 @@
 ---
+
 - hosts: all
-  gather_facts: False
+  gather_facts: True
   become: yes
   roles:
-    - { role: base, tags: base }
-    - { role: users, tags: users }
+    - base
+    - parity.chain.node
+    - ansible-role-cloudwatch-agent
