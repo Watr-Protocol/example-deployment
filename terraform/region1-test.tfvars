@@ -25,7 +25,7 @@ public_dns_zone  = "region1-test.mycompany.com"
 private_dns_zone = "region1-test.internal"
 
 # Peering
-vpc_peerings = {}
+vpc_peerings           = {}
 vpc_peerings_to_accept = {}
 
 # Cloudwatch IAM role for AWS
@@ -42,7 +42,7 @@ monitoring = {
     instance_type : "t3.small"
     subnet : "public"
     availability_zone : "eu-north-1c"
-    volume_size_gb : 50 
+    volume_size_gb : 50
   }
 }
 monitoring_database_enabled = false
@@ -68,6 +68,7 @@ access_nodes = {
     availability_zone : "eu-north-1b"
     volume_size_gb : 50
     provisioned_iops : 100
+    root_disk : 400
   }
 }
 
@@ -83,6 +84,7 @@ collator_nodes = {
     availability_zone : "eu-north-1b"
     volume_size_gb : 50
     provisioned_iops : 100
+    root_disk : 400
   },
   "region1-collator-2" : {
     ami : "ami-02c68996dd3d909c1" // Debian 11
@@ -91,6 +93,7 @@ collator_nodes = {
     availability_zone : "eu-north-1c"
     volume_size_gb : 50
     provisioned_iops : 100
+    root_disk : 400
   }
 }
 

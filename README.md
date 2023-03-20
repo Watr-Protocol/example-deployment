@@ -33,7 +33,7 @@
 
 5. Run a terraform plan to see a list of objects to be created:
 
-    `../terraform.sh region1-test plan -var-file==../region1-test.tfvars`
+    `../terraform.sh region1-test plan -var-file=../region1-test.tfvars`
 
 6. Apply this configuration to deploy the vpc, hosts etc...:
 
