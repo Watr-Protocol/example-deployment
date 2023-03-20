@@ -57,7 +57,7 @@ The `node` ansible-galaxy role comes from a paritytech ansible collections repo.
 
 2. Install ansible collections:
 
-   `mkdir collections && ansible-galaxy collection install -f -r requirements.yml -p ./collections`
+   `mkdir collections && ansible-galaxy install -f -r requirements.yml -p ./collections`
 
 3. Run base setup on all hosts:
 
