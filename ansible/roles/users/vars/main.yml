@@ -7,8 +7,8 @@ default_shell: /bin/bash
 
 system_users_active:
   - name: username
-    comment: "User Name"
+    comment: User Name
     uid: 2000
     home: /home/davidd
-    supplementarygroups: "ssh,sudo"
-    authorized_keys: "ssh-rsa xxxx"
+    supplementarygroups: ssh,sudo
+    authorized_keys: ssh-rsa xxxx

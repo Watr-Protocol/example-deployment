@@ -12,7 +12,7 @@
     - name: Make temporary download folder
       tempfile:
         state: directory
-        suffix: ".loki"
+        suffix: .loki
       register: download_dir
 
     - name: Download loki binary

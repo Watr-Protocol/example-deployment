@@ -68,17 +68,18 @@
     path: /etc/systemd/journald.conf
     regexp: '{{ item.regex }}'
   loop:
-    - {regex: '^#?ForwardToSyslog', line: "ForwardToSyslog=yes"}
-    - {regex: '^#?MaxLevelSyslog', line: "MaxLevelSyslog=debug"}
-- name: ensure data directory exists with the proper permissions
+    - {regex: "^#?ForwardToSyslog", line: "ForwardToSyslog=yes"}
+    - {regex: "^#?MaxLevelSyslog", line: "MaxLevelSyslog=debug"}
+
+- name: Ensure data directory exists with the proper permissions
   file:
-    path: "/var/log/syslog"
+    path: /var/log/syslog
     mode: 0775
 
-- name: restart systemd-journald
+- name: Restart systemd-journald
   systemd:
     name: systemd-journald
     state: restarted
 
-- name: start
+- name: Start
   ansible.builtin.shell: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start
